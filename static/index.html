@@ -5,43 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Robot Position Control</title>
 </head>
-<body>
-    <h1>Robot Position Control</h1>
+<body style="font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f7f9fc; color: #333;">
+
+    <h1 style="text-align: center; color: #444;">Robot Position Control</h1>
     
-    <form id="positionForm">
-        <label>Servo 1 Position: 
-            <input type="range" id="servo1" min="1000" max="4000" value="2297" oninput="updatePosition()">
-            <span id="value1">2297</span>
-        </label><br>
+    <form id="positionForm" style="max-width: 400px; margin: 0 auto; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0px 4px 8px rgba(0,0,0,0.1);">
+        <!-- Servo 1 -->
+        <label style="display: block; margin-bottom: 15px;">Servo 1 Position: 
+            <input type="range" id="servo1" min="2000" max="3500" value="2297" oninput="updatePosition()" style="width: 100%;">
+            <span id="value1" style="font-weight: bold;">2297</span>
+            <button type="button" onclick="rebootMotor(1)" style="margin-top: 10px;">Reboot Servo 1</button>
+        </label>
         
-        <label>Servo 2 Position: 
-            <input type="range" id="servo2" min="1000" max="4000" value="2297" oninput="updatePosition()">
-            <span id="value2">2297</span>
-        </label><br>
+        <!-- Servo 2 -->
+        <label style="display: block; margin-bottom: 15px;">Servo 2 Position: 
+            <input type="range" id="servo2" min="1000" max="4000" value="2297" oninput="updatePosition()" style="width: 100%;">
+            <span id="value2" style="font-weight: bold;">2297</span>
+            <button type="button" onclick="rebootMotor(2)" style="margin-top: 10px;">Reboot Servo 2</button>
+        </label>
         
-        <label>Servo 3 Position: 
-            <input type="range" id="servo3" min="1000" max="4000" value="2193" oninput="updatePosition()">
-            <span id="value3">2193</span>
-        </label><br>
+        <!-- Servo 3 -->
+        <label style="display: block; margin-bottom: 15px;">Servo 3 Position: 
+            <input type="range" id="servo3" min="1000" max="4000" value="2193" oninput="updatePosition()" style="width: 100%;">
+            <span id="value3" style="font-weight: bold;">2193</span>
+            <button type="button" onclick="rebootMotor(3)" style="margin-top: 10px;">Reboot Servo 3</button>
+        </label>
         
-        <label>Servo 4 Position: 
-            <input type="range" id="servo4" min="1000" max="4000" value="1923" oninput="updatePosition()">
-            <span id="value4">1923</span>
-        </label><br>
+        <!-- Servo 4 -->
+        <label style="display: block; margin-bottom: 15px;">Servo 4 Position: 
+            <input type="range" id="servo4" min="1000" max="4000" value="1923" oninput="updatePosition()" style="width: 100%;">
+            <span id="value4" style="font-weight: bold;">1923</span>
+            <button type="button" onclick="rebootMotor(4)" style="margin-top: 10px;">Reboot Servo 4</button>
+        </label>
         
-        <label>Servo 5 Position: 
-            <input type="range" id="servo5" min="1000" max="4000" value="2075" oninput="updatePosition()">
-            <span id="value5">2075</span>
-        </label><br>
+        <!-- Servo 5 -->
+        <label style="display: block; margin-bottom: 15px;">Servo 5 Position: 
+            <input type="range" id="servo5" min="1000" max="4000" value="2075" oninput="updatePosition()" style="width: 100%;">
+            <span id="value5" style="font-weight: bold;">2075</span>
+            <button type="button" onclick="rebootMotor(5)" style="margin-top: 10px;">Reboot Servo 5</button>
+        </label>
         
-        <label>Servo 6 Position: 
-            <input type="range" id="servo6" min="1000" max="4000" value="2315" oninput="updatePosition()">
-            <span id="value6">2315</span>
-        </label><br><br>
+        <!-- Servo 6 -->
+        <label style="display: block; margin-bottom: 15px;">Servo 6 Position: 
+            <input type="range" id="servo6" min="1000" max="4000" value="2315" oninput="updatePosition()" style="width: 100%;">
+            <span id="value6" style="font-weight: bold;">2315</span>
+            <button type="button" onclick="rebootMotor(6)" style="margin-top: 10px;">Reboot Servo 6</button>
+        </label>
     </form>
 
-    <h2>Response</h2>
-    <pre id="responseOutput"></pre>
+    <h2 style="text-align: center; color: #444; margin-top: 40px;">Response</h2>
+    <pre id="responseOutput" style="max-width: 600px; margin: 0 auto; background-color: #f0f4f8; padding: 20px; border-radius: 8px; box-shadow: 0px 4px 8px rgba(0,0,0,0.1); font-family: monospace; color: #333;"></pre>
 
     <script>
         function updatePosition() {
@@ -68,12 +81,29 @@
 
         async function setPosition(positions) {
             try {
-                const response = await fetch("http://127.0.0.1:8000/set_position/", {
+                const response = await fetch("/set_position/", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({ positions })
+                });
+
+                const result = await response.json();
+                document.getElementById("responseOutput").textContent = JSON.stringify(result, null, 2);
+            } catch (error) {
+                document.getElementById("responseOutput").textContent = `Error: ${error}`;
+            }
+        }
+
+        async function rebootMotor(motorId) {
+            try {
+                const response = await fetch("/reboot/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ servo_id: motorId })
                 });
 
                 const result = await response.json();
