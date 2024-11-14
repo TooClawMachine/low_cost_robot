@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot Position Control</title>
+</head>
+<body>
+    <h1>Robot Position Control</h1>
+    
+    <form id="positionForm">
+        <label>Servo 1 Position: 
+            <input type="range" id="servo1" min="1000" max="4000" value="2297" oninput="updatePosition()">
+            <span id="value1">2297</span>
+        </label><br>
+        
+        <label>Servo 2 Position: 
+            <input type="range" id="servo2" min="1000" max="4000" value="2297" oninput="updatePosition()">
+            <span id="value2">2297</span>
+        </label><br>
+        
+        <label>Servo 3 Position: 
+            <input type="range" id="servo3" min="1000" max="4000" value="2193" oninput="updatePosition()">
+            <span id="value3">2193</span>
+        </label><br>
+        
+        <label>Servo 4 Position: 
+            <input type="range" id="servo4" min="1000" max="4000" value="1923" oninput="updatePosition()">
+            <span id="value4">1923</span>
+        </label><br>
+        
+        <label>Servo 5 Position: 
+            <input type="range" id="servo5" min="1000" max="4000" value="2075" oninput="updatePosition()">
+            <span id="value5">2075</span>
+        </label><br>
+        
+        <label>Servo 6 Position: 
+            <input type="range" id="servo6" min="1000" max="4000" value="2315" oninput="updatePosition()">
+            <span id="value6">2315</span>
+        </label><br><br>
+    </form>
+
+    <h2>Response</h2>
+    <pre id="responseOutput"></pre>
+
+    <script>
+        function updatePosition() {
+            const positions = [
+                parseInt(document.getElementById("servo1").value),
+                parseInt(document.getElementById("servo2").value),
+                parseInt(document.getElementById("servo3").value),
+                parseInt(document.getElementById("servo4").value),
+                parseInt(document.getElementById("servo5").value),
+                parseInt(document.getElementById("servo6").value)
+            ];
+
+            // Update display values
+            document.getElementById("value1").textContent = positions[0];
+            document.getElementById("value2").textContent = positions[1];
+            document.getElementById("value3").textContent = positions[2];
+            document.getElementById("value4").textContent = positions[3];
+            document.getElementById("value5").textContent = positions[4];
+            document.getElementById("value6").textContent = positions[5];
+
+            // Send the updated positions to the server
+            setPosition(positions);
+        }
+
+        async function setPosition(positions) {
+            try {
+                const response = await fetch("http://127.0.0.1:8000/set_position/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ positions })
+                });
+
+                const result = await response.json();
+                document.getElementById("responseOutput").textContent = JSON.stringify(result, null, 2);
+            } catch (error) {
+                document.getElementById("responseOutput").textContent = `Error: ${error}`;
+            }
+        }
+    </script>
+</body>
+</html>

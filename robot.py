@@ -166,7 +166,7 @@ class Robot:
 
 
 if __name__ == "__main__":
-    robot = Robot(device_name='/dev/tty.usbmodem57380045631')
+    robot = Robot('COM6')
     robot._disable_torque()
     for _ in range(10000):
         s = time.time()
