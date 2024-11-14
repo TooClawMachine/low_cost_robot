@@ -164,6 +164,10 @@ class Robot:
         self._enable_torque()
         self.motor_control_state = MotorControlType.POSITION_CONTROL
 
+    def reboot(self, motor_id):
+        if motor_id in self.servo_ids and self.dynamixel.packetHandler and self.dynamixel.portHandler:
+            self.dynamixel.packetHandler.reboot(self.dynamixel.portHandler, motor_id)
+
 
 if __name__ == "__main__":
     robot = Robot('COM6')
