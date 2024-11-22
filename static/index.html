@@ -8,44 +8,43 @@
 <body style="font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f7f9fc; color: #333;">
 
     <h1 style="text-align: center; color: #444;">Robot Position Control</h1>
-    
+
+    <!-- Dropdown to select robot arm -->
+    <div style="text-align: center; margin-bottom: 20px;">
+        <label for="robotSelector" style="font-weight: bold; margin-right: 10px;">Select Robot Arm:</label>
+        <select id="robotSelector" onchange="updateArmSelection()" style="padding: 5px 10px; border: 1px solid #ccc; border-radius: 4px;">
+            <option value="arm1">Robot Arm 1</option>
+            <option value="arm2">Robot Arm 2</option>
+        </select>
+    </div>
+
     <form id="positionForm" style="max-width: 400px; margin: 0 auto; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0px 4px 8px rgba(0,0,0,0.1);">
-        <!-- Servo 1 -->
+        <!-- Servo controls -->
         <label style="display: block; margin-bottom: 15px;">Servo 1 Position: 
             <input type="range" id="servo1" min="2000" max="3500" value="2297" oninput="updatePosition()" style="width: 100%;">
             <span id="value1" style="font-weight: bold;">2297</span>
             <button type="button" onclick="rebootMotor(1)" style="margin-top: 10px;">Reboot Servo 1</button>
         </label>
-        
-        <!-- Servo 2 -->
         <label style="display: block; margin-bottom: 15px;">Servo 2 Position: 
             <input type="range" id="servo2" min="1000" max="4000" value="2297" oninput="updatePosition()" style="width: 100%;">
             <span id="value2" style="font-weight: bold;">2297</span>
             <button type="button" onclick="rebootMotor(2)" style="margin-top: 10px;">Reboot Servo 2</button>
         </label>
-        
-        <!-- Servo 3 -->
         <label style="display: block; margin-bottom: 15px;">Servo 3 Position: 
             <input type="range" id="servo3" min="1000" max="4000" value="2193" oninput="updatePosition()" style="width: 100%;">
             <span id="value3" style="font-weight: bold;">2193</span>
             <button type="button" onclick="rebootMotor(3)" style="margin-top: 10px;">Reboot Servo 3</button>
         </label>
-        
-        <!-- Servo 4 -->
         <label style="display: block; margin-bottom: 15px;">Servo 4 Position: 
             <input type="range" id="servo4" min="1000" max="4000" value="1923" oninput="updatePosition()" style="width: 100%;">
             <span id="value4" style="font-weight: bold;">1923</span>
             <button type="button" onclick="rebootMotor(4)" style="margin-top: 10px;">Reboot Servo 4</button>
         </label>
-        
-        <!-- Servo 5 -->
         <label style="display: block; margin-bottom: 15px;">Servo 5 Position: 
             <input type="range" id="servo5" min="1000" max="4000" value="2075" oninput="updatePosition()" style="width: 100%;">
             <span id="value5" style="font-weight: bold;">2075</span>
             <button type="button" onclick="rebootMotor(5)" style="margin-top: 10px;">Reboot Servo 5</button>
         </label>
-        
-        <!-- Servo 6 -->
         <label style="display: block; margin-bottom: 15px;">Servo 6 Position: 
             <input type="range" id="servo6" min="1000" max="4000" value="2315" oninput="updatePosition()" style="width: 100%;">
             <span id="value6" style="font-weight: bold;">2315</span>
@@ -57,7 +56,14 @@
     <pre id="responseOutput" style="max-width: 600px; margin: 0 auto; background-color: #f0f4f8; padding: 20px; border-radius: 8px; box-shadow: 0px 4px 8px rgba(0,0,0,0.1); font-family: monospace; color: #333;"></pre>
 
     <script>
-        function updatePosition() {
+        let selectedArm = "arm1"; // Default selected arm
+
+        function updateArmSelection() {
+            selectedArm = document.getElementById("robotSelector").value;
+            document.getElementById("responseOutput").textContent = `Switched to ${selectedArm}`;
+        }
+
+        async function updatePosition() {
             const positions = [
                 parseInt(document.getElementById("servo1").value),
                 parseInt(document.getElementById("servo2").value),
@@ -76,12 +82,8 @@
             document.getElementById("value6").textContent = positions[5];
 
             // Send the updated positions to the server
-            setPosition(positions);
-        }
-
-        async function setPosition(positions) {
             try {
-                const response = await fetch("/set_position/", {
+                const response = await fetch(`/${selectedArm}/set_position/`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -98,7 +100,7 @@
 
         async function rebootMotor(motorId) {
             try {
-                const response = await fetch("/reboot/", {
+                const response = await fetch(`/${selectedArm}/reboot/`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
