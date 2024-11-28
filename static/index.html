@@ -3,60 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Robot Position Control</title>
+    <title>Robot Arm and Claw Machine Control</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f7f9fc;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: #444;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+        }
+        #videoContainer, .controls {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        #videoContainer img {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+        .controls h2 {
+            margin-top: 0;
+            text-align: center;
+        }
+        .controls form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .servo-group {
+            flex: 1 1 calc(50% - 10px);
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .servo-group label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .servo-group input[type="range"] {
+            width: 100%;
+            margin: 5px 0;
+        }
+        .response-container {
+            margin-top: 20px;
+            background-color: #f0f4f8;
+            padding: 10px;
+            border-radius: 8px;
+            font-family: monospace;
+            color: #333;
+            overflow: auto;
+        }
+        select {
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .arm-controls {
+            flex: 1 1 100%;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .arm-controls h2 {
+            text-align: center;
+        }
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .toggle-group label {
+            margin-left: 10px;
+            font-weight: bold;
+        }
+    </style>
 </head>
-<body style="font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f7f9fc; color: #333;">
+<body>
+    <h1>Robot Arm and Claw Machine Control</h1>
 
-    <h1 style="text-align: center; color: #444;">Robot Position Control</h1>
+    <div class="container">
+        <!-- Video Feed Section -->
+        <div id="videoContainer">
+            <h2>Live Video Feed</h2>
+            <img src="/video_feed" alt="Claw Machine Video Feed">
+        </div>
 
-    <!-- Dropdown to select robot arm -->
-    <div style="text-align: center; margin-bottom: 20px;">
-        <label for="robotSelector" style="font-weight: bold; margin-right: 10px;">Select Robot Arm:</label>
-        <select id="robotSelector" onchange="updateArmSelection()" style="padding: 5px 10px; border: 1px solid #ccc; border-radius: 4px;">
-            <option value="arm1">Robot Arm 1</option>
-            <option value="arm2">Robot Arm 2</option>
-        </select>
+        <!-- Controls Section -->
+        <div class="controls">
+            <div class="toggle-group">
+                <input type="checkbox" id="dualControlToggle" onchange="toggleDualControl()">
+                <label for="dualControlToggle">Show both arms controls</label>
+            </div>
+            <!-- Arm Selector -->
+            <div id="armSelectorContainer">
+                <label for="robotSelector" style="font-weight: bold;">Select Robot Arm:</label>
+                <select id="robotSelector" onchange="updateArmSelection()">
+                    <option value="arm1">Robot Arm 1</option>
+                    <option value="arm2">Robot Arm 2</option>
+                </select>
+            </div>
+
+            <!-- Controls for Arm 1 -->
+            <div id="controls_arm1" class="arm-controls">
+                <h2>Robot Arm 1 Controls</h2>
+                <form id="positionForm1">
+                    <!-- Servo controls for Arm 1 -->
+                    <div class="servo-group">
+                        <label>Servo 1: <span id="value1_1">2297</span></label>
+                        <input type="range" id="servo1_1" min="2000" max="3500" value="2297" oninput="updatePosition()">
+                    </div>
+                    <div class="servo-group">
+                        <label>Servo 2: <span id="value2_1">2297</span></label>
+                        <input type="range" id="servo2_1" min="1000" max="4000" value="2297" oninput="updatePosition()">
+                    </div>
+                    <div class="servo-group">
+                        <label>Servo 3: <span id="value3_1">2193</span></label>
+                        <input type="range" id="servo3_1" min="1000" max="4000" value="2193" oninput="updatePosition()">
+                    </div>
+                    <div class="servo-group">
+                        <label>Servo 4: <span id="value4_1">1923</span></label>
+                        <input type="range" id="servo4_1" min="1000" max="4000" value="1923" oninput="updatePosition()">
+                    </div>
+                    <div class="servo-group">
+                        <label>Servo 5: <span id="value5_1">2075</span></label>
+                        <input type="range" id="servo5_1" min="1000" max="4000" value="2075" oninput="updatePosition()">
+                    </div>
+                    <div class="servo-group">
+                        <label>Servo 6: <span id="value6_1">2315</span></label>
+                        <input type="range" id="servo6_1" min="1000" max="4000" value="2315" oninput="updatePosition()">
+                    </div>
+                </form>
+            </div>
+
+            <!-- Controls for Arm 2 -->
+            <div id="controls_arm2" class="arm-controls" style="display: none;">
+                <h2>Robot Arm 2 Controls</h2>
+                <form id="positionForm2">
+                    <!-- Servo controls for Arm 2 -->
+                    <div class="servo-group">
+                        <label>Servo 1: <span id="value1_2">2297</span></label>
+                        <input type="range" id="servo1_2" min="2000" max="3500" value="2297" oninput="updatePosition()">
+                    </div>
+                    <div class="servo-group">
+                        <label>Servo 2: <span id="value2_2">2297</span></label>
+                        <input type="range" id="servo2_2" min="1000" max="4000" value="2297" oninput="updatePosition()">
+                    </div>
+                    <div class="servo-group">
+                        <label>Servo 3: <span id="value3_2">2193</span></label>
+                        <input type="range" id="servo3_2" min="1000" max="4000" value="2193" oninput="updatePosition()">
+                    </div>
+                    <div class="servo-group">
+                        <label>Servo 4: <span id="value4_2">1923</span></label>
+                        <input type="range" id="servo4_2" min="1000" max="4000" value="1923" oninput="updatePosition()">
+                    </div>
+                    <div class="servo-group">
+                        <label>Servo 5: <span id="value5_2">2075</span></label>
+                        <input type="range" id="servo5_2" min="1000" max="4000" value="2075" oninput="updatePosition()">
+                    </div>
+                    <div class="servo-group">
+                        <label>Servo 6: <span id="value6_2">2315</span></label>
+                        <input type="range" id="servo6_2" min="1000" max="4000" value="2315" oninput="updatePosition()">
+                    </div>
+                </form>
+            </div>
+
+                    <!-- PlayCanvas Project Section -->
+        <div id="playcanvasContainer">
+            <h2>3D Simulation</h2>
+            <iframe src="https://playcanv.as/p/eBnX9trs/" allowfullscreen></iframe>
+        </div>
+        </div>
     </div>
 
-    <form id="positionForm" style="max-width: 400px; margin: 0 auto; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0px 4px 8px rgba(0,0,0,0.1);">
-        <!-- Servo controls -->
-        <label style="display: block; margin-bottom: 15px;">Servo 1 Position: 
-            <input type="range" id="servo1" min="2000" max="3500" value="2297" oninput="updatePosition()" style="width: 100%;">
-            <span id="value1" style="font-weight: bold;">2297</span>
-            <button type="button" onclick="rebootMotor(1)" style="margin-top: 10px;">Reboot Servo 1</button>
-        </label>
-        <label style="display: block; margin-bottom: 15px;">Servo 2 Position: 
-            <input type="range" id="servo2" min="1000" max="4000" value="2297" oninput="updatePosition()" style="width: 100%;">
-            <span id="value2" style="font-weight: bold;">2297</span>
-            <button type="button" onclick="rebootMotor(2)" style="margin-top: 10px;">Reboot Servo 2</button>
-        </label>
-        <label style="display: block; margin-bottom: 15px;">Servo 3 Position: 
-            <input type="range" id="servo3" min="1000" max="4000" value="2193" oninput="updatePosition()" style="width: 100%;">
-            <span id="value3" style="font-weight: bold;">2193</span>
-            <button type="button" onclick="rebootMotor(3)" style="margin-top: 10px;">Reboot Servo 3</button>
-        </label>
-        <label style="display: block; margin-bottom: 15px;">Servo 4 Position: 
-            <input type="range" id="servo4" min="1000" max="4000" value="1923" oninput="updatePosition()" style="width: 100%;">
-            <span id="value4" style="font-weight: bold;">1923</span>
-            <button type="button" onclick="rebootMotor(4)" style="margin-top: 10px;">Reboot Servo 4</button>
-        </label>
-        <label style="display: block; margin-bottom: 15px;">Servo 5 Position: 
-            <input type="range" id="servo5" min="1000" max="4000" value="2075" oninput="updatePosition()" style="width: 100%;">
-            <span id="value5" style="font-weight: bold;">2075</span>
-            <button type="button" onclick="rebootMotor(5)" style="margin-top: 10px;">Reboot Servo 5</button>
-        </label>
-        <label style="display: block; margin-bottom: 15px;">Servo 6 Position: 
-            <input type="range" id="servo6" min="1000" max="4000" value="2315" oninput="updatePosition()" style="width: 100%;">
-            <span id="value6" style="font-weight: bold;">2315</span>
-            <button type="button" onclick="rebootMotor(6)" style="margin-top: 10px;">Reboot Servo 6</button>
-        </label>
-    </form>
-
-    <h2 style="text-align: center; color: #444; margin-top: 40px;">Response</h2>
-    <pre id="responseOutput" style="max-width: 600px; margin: 0 auto; background-color: #f0f4f8; padding: 20px; border-radius: 8px; box-shadow: 0px 4px 8px rgba(0,0,0,0.1); font-family: monospace; color: #333;"></pre>
+    <h2>Response</h2>
+    <pre id="responseOutput" class="response-container"></pre>
 
     <script>
         let selectedArm = "arm1"; // Default selected arm
+        let dualControl = false; // Dual control mode off by default
+
+        function toggleDualControl() {
+            dualControl = document.getElementById("dualControlToggle").checked;
+            if (dualControl) {
+                // Show both controls and hide selector
+                document.getElementById("controls_arm2").style.display = "block";
+                document.getElementById("armSelectorContainer").style.display = "none";
+                document.getElementById("responseOutput").textContent = "Dual Arm Control Mode Activated";
+            } else {
+                // Hide second arm controls and show selector
+                document.getElementById("controls_arm2").style.display = "none";
+                document.getElementById("armSelectorContainer").style.display = "block";
+                document.getElementById("responseOutput").textContent = `Switched to ${selectedArm}`;
+            }
+        }
 
         function updateArmSelection() {
             selectedArm = document.getElementById("robotSelector").value;
@@ -64,54 +222,100 @@
         }
 
         async function updatePosition() {
-            const positions = [
-                parseInt(document.getElementById("servo1").value),
-                parseInt(document.getElementById("servo2").value),
-                parseInt(document.getElementById("servo3").value),
-                parseInt(document.getElementById("servo4").value),
-                parseInt(document.getElementById("servo5").value),
-                parseInt(document.getElementById("servo6").value)
-            ];
+            if (dualControl) {
+                // Get positions for both arms
+                const positions1 = [
+                    parseInt(document.getElementById("servo1_1").value),
+                    parseInt(document.getElementById("servo2_1").value),
+                    parseInt(document.getElementById("servo3_1").value),
+                    parseInt(document.getElementById("servo4_1").value),
+                    parseInt(document.getElementById("servo5_1").value),
+                    parseInt(document.getElementById("servo6_1").value)
+                ];
+                const positions2 = [
+                    parseInt(document.getElementById("servo1_2").value),
+                    parseInt(document.getElementById("servo2_2").value),
+                    parseInt(document.getElementById("servo3_2").value),
+                    parseInt(document.getElementById("servo4_2").value),
+                    parseInt(document.getElementById("servo5_2").value),
+                    parseInt(document.getElementById("servo6_2").value)
+                ];
 
-            // Update display values
-            document.getElementById("value1").textContent = positions[0];
-            document.getElementById("value2").textContent = positions[1];
-            document.getElementById("value3").textContent = positions[2];
-            document.getElementById("value4").textContent = positions[3];
-            document.getElementById("value5").textContent = positions[4];
-            document.getElementById("value6").textContent = positions[5];
+                // Update display values for Arm 1
+                document.getElementById("value1_1").textContent = positions1[0];
+                document.getElementById("value2_1").textContent = positions1[1];
+                document.getElementById("value3_1").textContent = positions1[2];
+                document.getElementById("value4_1").textContent = positions1[3];
+                document.getElementById("value5_1").textContent = positions1[4];
+                document.getElementById("value6_1").textContent = positions1[5];
 
-            // Send the updated positions to the server
-            try {
-                const response = await fetch(`/${selectedArm}/set_position/`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ positions })
-                });
+                // Update display values for Arm 2
+                document.getElementById("value1_2").textContent = positions2[0];
+                document.getElementById("value2_2").textContent = positions2[1];
+                document.getElementById("value3_2").textContent = positions2[2];
+                document.getElementById("value4_2").textContent = positions2[3];
+                document.getElementById("value5_2").textContent = positions2[4];
+                document.getElementById("value6_2").textContent = positions2[5];
 
-                const result = await response.json();
-                document.getElementById("responseOutput").textContent = JSON.stringify(result, null, 2);
-            } catch (error) {
-                document.getElementById("responseOutput").textContent = `Error: ${error}`;
-            }
-        }
+                try {
+                    // Send positions for Arm 1
+                    const response1 = await fetch(`/arm1/set_position/`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ positions: positions1 })
+                    });
+                    const result1 = await response1.json();
 
-        async function rebootMotor(motorId) {
-            try {
-                const response = await fetch(`/${selectedArm}/reboot/`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ servo_id: motorId })
-                });
+                    // Send positions for Arm 2
+                    const response2 = await fetch(`/arm2/set_position/`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ positions: positions2 })
+                    });
+                    const result2 = await response2.json();
 
-                const result = await response.json();
-                document.getElementById("responseOutput").textContent = JSON.stringify(result, null, 2);
-            } catch (error) {
-                document.getElementById("responseOutput").textContent = `Error: ${error}`;
+                    // Display combined responses
+                    document.getElementById("responseOutput").textContent = `Arm 1 Response:\n${JSON.stringify(result1, null, 2)}\n\nArm 2 Response:\n${JSON.stringify(result2, null, 2)}`;
+                } catch (error) {
+                    document.getElementById("responseOutput").textContent = `Error: ${error}`;
+                }
+            } else {
+                // Single arm control
+                const positions = [
+                    parseInt(document.getElementById("servo1_1").value),
+                    parseInt(document.getElementById("servo2_1").value),
+                    parseInt(document.getElementById("servo3_1").value),
+                    parseInt(document.getElementById("servo4_1").value),
+                    parseInt(document.getElementById("servo5_1").value),
+                    parseInt(document.getElementById("servo6_1").value)
+                ];
+
+                // Update display values
+                document.getElementById("value1_1").textContent = positions[0];
+                document.getElementById("value2_1").textContent = positions[1];
+                document.getElementById("value3_1").textContent = positions[2];
+                document.getElementById("value4_1").textContent = positions[3];
+                document.getElementById("value5_1").textContent = positions[4];
+                document.getElementById("value6_1").textContent = positions[5];
+
+                try {
+                    const response = await fetch(`/${selectedArm}/set_position/`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ positions })
+                    });
+
+                    const result = await response.json();
+                    document.getElementById("responseOutput").textContent = JSON.stringify(result, null, 2);
+                } catch (error) {
+                    document.getElementById("responseOutput").textContent = `Error: ${error}`;
+                }
             }
         }
     </script>
