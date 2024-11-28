@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Robot Arm and Claw Machine Control</title>
     <style>
         body {
@@ -11,36 +10,33 @@
             padding: 20px;
             background-color: #f7f9fc;
             color: #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
         h1 {
             margin-bottom: 20px;
             color: #444;
+            text-align: center;
         }
         .container {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 20px;
-            width: 100%;
             max-width: 1200px;
+            margin: 0 auto;
         }
-        #videoContainer, .controls {
+        #videoContainer, #playcanvasContainer, .arm-controls {
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
             padding: 20px;
         }
         #videoContainer img {
-            max-width: 100%;
+            width: 100%;
             border-radius: 8px;
         }
-        .controls h2 {
-            margin-top: 0;
+        .arm-controls h2 {
             text-align: center;
         }
-        .controls form {
+        .arm-controls form {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
@@ -69,31 +65,10 @@
             color: #333;
             overflow: auto;
         }
-        select {
-            padding: 5px 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            margin-bottom: 10px;
-        }
-        .arm-controls {
-            flex: 1 1 100%;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            margin-top: 20px;
-        }
-        .arm-controls h2 {
-            text-align: center;
-        }
-        .toggle-group {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .toggle-group label {
-            margin-left: 10px;
-            font-weight: bold;
+        iframe {
+            width: 100%;
+            height: 400px;
+            border: none;
         }
     </style>
 </head>
@@ -101,27 +76,20 @@
     <h1>Robot Arm and Claw Machine Control</h1>
 
     <div class="container">
-        <!-- Video Feed Section -->
+        <!-- Live Video Feed Column -->
         <div id="videoContainer">
             <h2>Live Video Feed</h2>
             <img src="/video_feed" alt="Claw Machine Video Feed">
         </div>
 
-        <!-- Controls Section -->
-        <div class="controls">
-            <div class="toggle-group">
-                <input type="checkbox" id="dualControlToggle" onchange="toggleDualControl()">
-                <label for="dualControlToggle">Show both arms controls</label>
-            </div>
-            <!-- Arm Selector -->
-            <div id="armSelectorContainer">
-                <label for="robotSelector" style="font-weight: bold;">Select Robot Arm:</label>
-                <select id="robotSelector" onchange="updateArmSelection()">
-                    <option value="arm1">Robot Arm 1</option>
-                    <option value="arm2">Robot Arm 2</option>
-                </select>
-            </div>
+        <!-- PlayCanvas Simulation Column -->
+        <div id="playcanvasContainer">
+            <h2>3D Simulation</h2>
+            <iframe src="https://playcanv.as/p/eBnX9trs/" allowfullscreen></iframe>
+        </div>
 
+        <!-- Controls Column -->
+        <div class="controls-column">
             <!-- Controls for Arm 1 -->
             <div id="controls_arm1" class="arm-controls">
                 <h2>Robot Arm 1 Controls</h2>
@@ -155,7 +123,7 @@
             </div>
 
             <!-- Controls for Arm 2 -->
-            <div id="controls_arm2" class="arm-controls" style="display: none;">
+            <div id="controls_arm2" class="arm-controls">
                 <h2>Robot Arm 2 Controls</h2>
                 <form id="positionForm2">
                     <!-- Servo controls for Arm 2 -->
@@ -186,136 +154,73 @@
                 </form>
             </div>
 
-                    <!-- PlayCanvas Project Section -->
-        <div id="playcanvasContainer">
-            <h2>3D Simulation</h2>
-            <iframe src="https://playcanv.as/p/eBnX9trs/" allowfullscreen></iframe>
-        </div>
+            <h2>Response</h2>
+            <pre id="responseOutput" class="response-container"></pre>
         </div>
     </div>
 
-    <h2>Response</h2>
-    <pre id="responseOutput" class="response-container"></pre>
-
     <script>
-        let selectedArm = "arm1"; // Default selected arm
-        let dualControl = false; // Dual control mode off by default
-
-        function toggleDualControl() {
-            dualControl = document.getElementById("dualControlToggle").checked;
-            if (dualControl) {
-                // Show both controls and hide selector
-                document.getElementById("controls_arm2").style.display = "block";
-                document.getElementById("armSelectorContainer").style.display = "none";
-                document.getElementById("responseOutput").textContent = "Dual Arm Control Mode Activated";
-            } else {
-                // Hide second arm controls and show selector
-                document.getElementById("controls_arm2").style.display = "none";
-                document.getElementById("armSelectorContainer").style.display = "block";
-                document.getElementById("responseOutput").textContent = `Switched to ${selectedArm}`;
-            }
-        }
-
-        function updateArmSelection() {
-            selectedArm = document.getElementById("robotSelector").value;
-            document.getElementById("responseOutput").textContent = `Switched to ${selectedArm}`;
-        }
-
         async function updatePosition() {
-            if (dualControl) {
-                // Get positions for both arms
-                const positions1 = [
-                    parseInt(document.getElementById("servo1_1").value),
-                    parseInt(document.getElementById("servo2_1").value),
-                    parseInt(document.getElementById("servo3_1").value),
-                    parseInt(document.getElementById("servo4_1").value),
-                    parseInt(document.getElementById("servo5_1").value),
-                    parseInt(document.getElementById("servo6_1").value)
-                ];
-                const positions2 = [
-                    parseInt(document.getElementById("servo1_2").value),
-                    parseInt(document.getElementById("servo2_2").value),
-                    parseInt(document.getElementById("servo3_2").value),
-                    parseInt(document.getElementById("servo4_2").value),
-                    parseInt(document.getElementById("servo5_2").value),
-                    parseInt(document.getElementById("servo6_2").value)
-                ];
+            // Get positions for Arm 1
+            const positions1 = [
+                parseInt(document.getElementById("servo1_1").value),
+                parseInt(document.getElementById("servo2_1").value),
+                parseInt(document.getElementById("servo3_1").value),
+                parseInt(document.getElementById("servo4_1").value),
+                parseInt(document.getElementById("servo5_1").value),
+                parseInt(document.getElementById("servo6_1").value)
+            ];
+            // Get positions for Arm 2
+            const positions2 = [
+                parseInt(document.getElementById("servo1_2").value),
+                parseInt(document.getElementById("servo2_2").value),
+                parseInt(document.getElementById("servo3_2").value),
+                parseInt(document.getElementById("servo4_2").value),
+                parseInt(document.getElementById("servo5_2").value),
+                parseInt(document.getElementById("servo6_2").value)
+            ];
 
-                // Update display values for Arm 1
-                document.getElementById("value1_1").textContent = positions1[0];
-                document.getElementById("value2_1").textContent = positions1[1];
-                document.getElementById("value3_1").textContent = positions1[2];
-                document.getElementById("value4_1").textContent = positions1[3];
-                document.getElementById("value5_1").textContent = positions1[4];
-                document.getElementById("value6_1").textContent = positions1[5];
+            // Update display values for Arm 1
+            document.getElementById("value1_1").textContent = positions1[0];
+            document.getElementById("value2_1").textContent = positions1[1];
+            document.getElementById("value3_1").textContent = positions1[2];
+            document.getElementById("value4_1").textContent = positions1[3];
+            document.getElementById("value5_1").textContent = positions1[4];
+            document.getElementById("value6_1").textContent = positions1[5];
 
-                // Update display values for Arm 2
-                document.getElementById("value1_2").textContent = positions2[0];
-                document.getElementById("value2_2").textContent = positions2[1];
-                document.getElementById("value3_2").textContent = positions2[2];
-                document.getElementById("value4_2").textContent = positions2[3];
-                document.getElementById("value5_2").textContent = positions2[4];
-                document.getElementById("value6_2").textContent = positions2[5];
+            // Update display values for Arm 2
+            document.getElementById("value1_2").textContent = positions2[0];
+            document.getElementById("value2_2").textContent = positions2[1];
+            document.getElementById("value3_2").textContent = positions2[2];
+            document.getElementById("value4_2").textContent = positions2[3];
+            document.getElementById("value5_2").textContent = positions2[4];
+            document.getElementById("value6_2").textContent = positions2[5];
 
-                try {
-                    // Send positions for Arm 1
-                    const response1 = await fetch(`/arm1/set_position/`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({ positions: positions1 })
-                    });
-                    const result1 = await response1.json();
+            try {
+                // Send positions for Arm 1
+                const response1 = await fetch(`/arm1/set_position/`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ positions: positions1 })
+                });
+                const result1 = await response1.json();
 
-                    // Send positions for Arm 2
-                    const response2 = await fetch(`/arm2/set_position/`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({ positions: positions2 })
-                    });
-                    const result2 = await response2.json();
+                // Send positions for Arm 2
+                const response2 = await fetch(`/arm2/set_position/`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ positions: positions2 })
+                });
+                const result2 = await response2.json();
 
-                    // Display combined responses
-                    document.getElementById("responseOutput").textContent = `Arm 1 Response:\n${JSON.stringify(result1, null, 2)}\n\nArm 2 Response:\n${JSON.stringify(result2, null, 2)}`;
-                } catch (error) {
-                    document.getElementById("responseOutput").textContent = `Error: ${error}`;
-                }
-            } else {
-                // Single arm control
-                const positions = [
-                    parseInt(document.getElementById("servo1_1").value),
-                    parseInt(document.getElementById("servo2_1").value),
-                    parseInt(document.getElementById("servo3_1").value),
-                    parseInt(document.getElementById("servo4_1").value),
-                    parseInt(document.getElementById("servo5_1").value),
-                    parseInt(document.getElementById("servo6_1").value)
-                ];
-
-                // Update display values
-                document.getElementById("value1_1").textContent = positions[0];
-                document.getElementById("value2_1").textContent = positions[1];
-                document.getElementById("value3_1").textContent = positions[2];
-                document.getElementById("value4_1").textContent = positions[3];
-                document.getElementById("value5_1").textContent = positions[4];
-                document.getElementById("value6_1").textContent = positions[5];
-
-                try {
-                    const response = await fetch(`/${selectedArm}/set_position/`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({ positions })
-                    });
-
-                    const result = await response.json();
-                    document.getElementById("responseOutput").textContent = JSON.stringify(result, null, 2);
-                } catch (error) {
-                    document.getElementById("responseOutput").textContent = `Error: ${error}`;
-                }
+                // Display combined responses
+                document.getElementById("responseOutput").textContent = `Arm 1 Response:\n${JSON.stringify(result1, null, 2)}\n\nArm 2 Response:\n${JSON.stringify(result2, null, 2)}`;
+            } catch (error) {
+                document.getElementById("responseOutput").textContent = `Error: ${error}`;
             }
         }
     </script>

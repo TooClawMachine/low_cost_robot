@@ -67,8 +67,8 @@ async def video_stream():
 
 # Configure robots
 robots = {
-    "arm1": Robot(Dynamixel.Config(baudrate=1_000_000, device_name="COM5").instantiate(), servo_ids=[1, 2, 3, 4, 5, 6]),
-    "arm2": Robot(Dynamixel.Config(baudrate=1_000_000, device_name="COM6").instantiate(), servo_ids=[1, 2, 3, 4, 5, 6]),
+    "arm1": Robot(Dynamixel.Config(baudrate=1_000_000, device_name="COM6").instantiate(), servo_ids=[1, 2, 3, 4, 5, 6]),
+    "arm2": Robot(Dynamixel.Config(baudrate=1_000_000, device_name="COM5").instantiate(), servo_ids=[1, 2, 3, 4, 5, 6]),
 }
 
 # Define the data model for incoming position data
